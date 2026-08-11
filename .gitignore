@@ -1,1 +1,186 @@
-# 用途：声明不应提交到版本库的依赖、缓存、构建产物、密钥和本地配置。
+# Quelyra Monorepo Git 忽略规则
+
+# ==============================================================================
+# 操作系统生成文件
+# ==============================================================================
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+Thumbs.db:encryptable
+Desktop.ini
+$RECYCLE.BIN/
+*.stackdump
+
+# ==============================================================================
+# IDE 与编辑器本地配置
+# ==============================================================================
+.idea/
+*.iml
+*.iws
+*.ipr
+.fleet/
+.project
+.classpath
+.settings/
+.history/
+*.swp
+*.swo
+*~
+
+# VS Code 只保留适合团队共享的推荐配置
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+
+# ==============================================================================
+# 环境变量、密钥与本地秘密
+# ==============================================================================
+.env
+.env.*
+!.env.example
+!.env.*.example
+**/.env
+**/.env.*
+!**/.env.example
+!**/.env.*.example
+
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+secrets/
+**/secrets/
+
+# 本地 Docker Compose 覆盖配置可能包含端口或秘密
+docker-compose.override.yml
+docker-compose.local.yml
+compose.override.yml
+compose.local.yml
+
+# ==============================================================================
+# Python：虚拟环境、缓存、测试与构建产物
+# ==============================================================================
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+.venv/
+venv/
+env/
+ENV/
+.tox/
+.nox/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.pyright/
+.hypothesis/
+.ipynb_checkpoints/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+pip-wheel-metadata/
+*.egg
+*.egg-info/
+.eggs/
+wheels/
+
+# ==============================================================================
+# Go：编译、测试、覆盖率与性能分析产物
+# ==============================================================================
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+coverage.out
+coverage.html
+cpu.prof
+mem.prof
+*.pprof
+services/query-gateway/bin/
+services/query-gateway/vendor/
+
+# 注意：go.sum 必须提交，不得加入忽略规则
+
+# ==============================================================================
+# Node.js / Vue3：依赖、缓存、测试与构建产物
+# ==============================================================================
+node_modules/
+.pnpm-store/
+.npm/
+.yarn/cache/
+.yarn/unplugged/
+.vite/
+.vitepress/cache/
+*.tsbuildinfo
+dist/
+build/
+coverage/
+storybook-static/
+playwright-report/
+test-results/
+cypress/screenshots/
+cypress/videos/
+cypress/downloads/
+
+# 注意：pnpm-lock.yaml、package-lock.json、yarn.lock 必须提交
+
+# ==============================================================================
+# 日志、进程、临时文件和本地缓存
+# ==============================================================================
+*.log
+logs/
+*.pid
+*.pid.lock
+*.seed
+*.tmp
+*.temp
+*.bak
+*.orig
+*.rej
+.cache/
+tmp/
+temp/
+
+# ==============================================================================
+# Quelyra 运行时数据与本地基础设施
+# ==============================================================================
+output/
+outputs/
+uploads/
+updated/
+artifacts/
+/data/
+/volumes/
+**/.local-data/
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+*.sqlite-shm
+*.sqlite-wal
+dump.rdb
+
+# ==============================================================================
+# 自动生成文件
+# ==============================================================================
+packages/contracts/generated/*
+!packages/contracts/generated/README.md
+!packages/contracts/generated/.gitkeep
+
+evals/reports/*
+!evals/reports/README.md
+!evals/reports/.gitkeep
+
+# 仓库根目录下本地生成的 API、分析和性能报告
+/reports/
+*.sarif

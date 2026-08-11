@@ -1,1 +1,126 @@
-# 用途：排除不应进入容器构建上下文的本地文件、缓存和生成产物。
+# Quelyra Monorepo Docker 构建上下文忽略规则
+
+# ==============================================================================
+# Git、IDE 与操作系统文件
+# ==============================================================================
+.git
+.gitignore
+.gitattributes
+.github
+.idea
+.vscode
+.fleet
+**/.DS_Store
+**/Thumbs.db
+**/Desktop.ini
+
+# ==============================================================================
+# 环境变量、密钥与本地覆盖配置
+# ==============================================================================
+.env
+.env.*
+**/.env
+**/.env.*
+**/*.pem
+**/*.key
+**/*.p12
+**/*.pfx
+**/*.jks
+**/*.keystore
+**/secrets
+docker-compose.override.yml
+docker-compose.local.yml
+compose.override.yml
+compose.local.yml
+
+# ==============================================================================
+# Python 依赖、缓存、测试与构建结果
+# ==============================================================================
+**/__pycache__
+**/*.py[cod]
+**/.venv
+**/venv
+**/env
+**/.tox
+**/.nox
+**/.pytest_cache
+**/.mypy_cache
+**/.ruff_cache
+**/.pyright
+**/.coverage
+**/.coverage.*
+**/coverage.xml
+**/htmlcov
+**/*.egg-info
+**/.eggs
+
+# ==============================================================================
+# Go 编译、测试与性能分析结果
+# ==============================================================================
+**/*.exe
+**/*.test
+**/*.out
+**/coverage.out
+**/coverage.html
+**/*.pprof
+**/cpu.prof
+**/mem.prof
+services/query-gateway/bin
+services/query-gateway/vendor
+
+# ==============================================================================
+# Node.js / Vue3 依赖、缓存、测试与构建结果
+# ==============================================================================
+**/node_modules
+**/.pnpm-store
+**/.npm
+**/.yarn/cache
+**/.yarn/unplugged
+**/.vite
+**/.vitepress/cache
+**/*.tsbuildinfo
+**/dist
+**/build
+**/coverage
+**/storybook-static
+**/playwright-report
+**/test-results
+**/cypress/screenshots
+**/cypress/videos
+**/cypress/downloads
+
+# ==============================================================================
+# 日志、临时文件与本地运行数据
+# ==============================================================================
+**/*.log
+logs
+**/*.pid
+**/*.pid.lock
+**/*.tmp
+**/*.temp
+**/*.bak
+**/.cache
+tmp
+temp
+output
+outputs
+uploads
+updated
+artifacts
+data
+volumes
+**/.local-data
+**/*.db
+**/*.sqlite
+**/*.sqlite3
+**/dump.rdb
+
+# ==============================================================================
+# 不参与应用镜像构建的本地报告和开发文档
+# ==============================================================================
+evals/reports
+reports
+docs/superpowers
+**/*.sarif
+
+# 不排除 apps、services 或 packages；服务构建可能需要共享 OpenAPI 契约。
