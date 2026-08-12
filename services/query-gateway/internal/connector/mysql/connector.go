@@ -1,1 +1,3 @@
 // 用途：实现 MySQL 连接和受限查询执行能力。
+
+package mysql

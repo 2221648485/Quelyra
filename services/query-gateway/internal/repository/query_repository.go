@@ -1,1 +1,3 @@
 // 用途：持久化查询生命周期和取消状态。
+
+package repository

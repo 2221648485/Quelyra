@@ -1,1 +1,6 @@
-// 用途：创建 Vue 应用并注册路由、状态管理和全局样式。
+import { createApp } from "vue";
+
+import App from "./App.vue";
+
+createApp(App).mount("#app");
+

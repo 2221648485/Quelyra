@@ -1,1 +1,3 @@
 // 用途：将 MySQL 系统目录转换为统一的网关元数据模型。
+
+package mysql

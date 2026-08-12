@@ -1,1 +1,16 @@
-# 用途：声明 Python 项目元数据、依赖以及格式化、类型检查和测试配置。
+[project]
+name = "quelyra-agent-api"
+version = "0.1.0"
+description = "Quelyra 智能编排与公共 API"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi[standard]==0.141.1",
+]
+
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+

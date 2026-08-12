@@ -1,1 +1,3 @@
 // 用途：将 PostgreSQL 执行计划转换为统一的查询成本信号。
+
+package postgres

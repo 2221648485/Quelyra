@@ -1,1 +1,3 @@
 // 用途：定义数据库无关的连接、元数据、Explain、执行和取消接口。
+
+package connector

@@ -1,1 +1,3 @@
 // 用途：捕获服务异常，避免泄露凭据或查询数据。
+
+package middleware

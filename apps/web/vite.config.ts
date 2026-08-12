@@ -1,1 +1,7 @@
-// 用途：配置 Vite、Vue 插件、路径别名、开发代理和构建行为。
+import { defineConfig } from "vite";
+import vue from "@vitejs/plugin-vue";
+
+export default defineConfig({
+  plugins: [vue()],
+});
+
