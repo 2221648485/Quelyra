@@ -1,0 +1,45 @@
+services:
+  agent-api:
+    command: ["fastapi", "dev", "src/quelyra_agent/entrypoints/api.py", "--host", "0.0.0.0", "--port", "8000"]
+    volumes:
+      - type: bind
+        source: ./services/agent-api/src
+        target: /app/src
+
+  query-gateway:
+    command: ["air", "-c", ".air.toml"]
+    volumes:
+      - type: bind
+        source: ./services/query-gateway/cmd
+        target: /app/cmd
+      - type: bind
+        source: ./services/query-gateway/internal
+        target: /app/internal
+      - type: bind
+        source: ./services/query-gateway/.air.toml
+        target: /app/.air.toml
+        read_only: true
+
+  web:
+    command: ["npm", "run", "dev"]
+    volumes:
+      - type: bind
+        source: ./apps/web/src
+        target: /app/src
+      - type: bind
+        source: ./apps/web/index.html
+        target: /app/index.html
+        read_only: true
+      - type: bind
+        source: ./apps/web/vite.config.ts
+        target: /app/vite.config.ts
+        read_only: true
+      - type: bind
+        source: ./apps/web/tsconfig.json
+        target: /app/tsconfig.json
+        read_only: true
+      - type: bind
+        source: ./apps/web/tsconfig.app.json
+        target: /app/tsconfig.app.json
+        read_only: true
+
