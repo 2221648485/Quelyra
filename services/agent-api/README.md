@@ -15,3 +15,7 @@
 - `prompts/`：版本化提示词模板。
 
 Graph Node 不直接访问数据库或 HTTP；外部交互必须经由 Service、Client 或 Repository。当前文件仅用于固定结构，尚未加入实现代码。
+
+## SQL方言职责
+
+Agent读取DataSource的`engine`、`engine_version`、`dialect`和能力快照，针对目标数据库生成SQL，并使用SQLGlot按对应Dialect解析。Agent不直接连接客户数据库，也不把方言转换结果视为天然正确；SQL仍需交给Query Gateway执行Explain和安全检查。

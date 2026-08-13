@@ -12,6 +12,12 @@ type Body struct {
 	Data    interface{} `json:"data,omitempty"`
 }
 
+func RequestID(c *gin.Context) string {
+	v, _ := c.Get("request_id")
+	s, _ := v.(string)
+	return s
+}
+
 func OK(c *gin.Context, data interface{}) {
 	c.JSON(http.StatusOK, Body{
 		Code:    0,
@@ -20,24 +26,11 @@ func OK(c *gin.Context, data interface{}) {
 	})
 }
 
-func Created(c *gin.Context, data interface{}) {
-	c.JSON(http.StatusCreated, Body{
-		Code:    0,
-		Message: "created",
-		Data:    data,
-	})
-}
-
-func BadRequest(c *gin.Context, message string) {
-	c.JSON(http.StatusBadRequest, Body{
-		Code:    http.StatusBadRequest,
+func Error(c *gin.Context, code int, message string) {
+	c.Set("error_code", code)
+	c.AbortWithStatusJSON(code, Body{
+		Code:    code,
 		Message: message,
-	})
-}
-
-func InternalServerError(c *gin.Context, message string) {
-	c.JSON(http.StatusInternalServerError, Body{
-		Code:    http.StatusInternalServerError,
-		Message: message,
+		Data:    "RequestID:" + RequestID(c),
 	})
 }

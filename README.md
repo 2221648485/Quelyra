@@ -29,6 +29,14 @@ Quelyra 通过“Python 智能编排 + Go 安全执行 + Vue3 交互工作台”
 
 ## 核心能力
 
+### 用户认证与多租户工作区
+
+- 用户使用邮箱和密码注册，系统自动创建个人工作区并授予 `owner` 角色。
+- 使用短期 Access Token、可轮换 Refresh Token 和可撤销会话完成登录态管理。
+- 第一版固定使用 `owner`、`admin`、`analyst` 三种角色。
+- 数据源、语义模型、会话、分析任务和审计记录均以 `workspace_id` 隔离。
+- Agent API 负责面向用户的身份认证与工作区授权；Query Gateway 验证内部服务身份，并重新校验数据源的工作区归属。
+
 ### 数据源接入与自动 Onboarding
 
 - 接入 MySQL、PostgreSQL 等关系型数据库。
@@ -50,6 +58,14 @@ Quelyra 通过“Python 智能编排 + Go 安全执行 + Vue3 交互工作台”
 - 支持执行前 `EXPLAIN`、成本检查、超时、行数和并发限制。
 - 支持字段脱敏、查询取消、结果过期和完整审计记录。
 
+### SQL方言与数据库适配
+
+- Python根据DataSource的Engine、版本和Schema直接生成目标方言SQL，并使用SQLGlot按该Dialect解析和校验。
+- Go根据平台库中的权威Engine选择MySQL或PostgreSQL Connector与Driver，并拒绝请求Dialect不一致的查询。
+- 每个Connector分别适配DSN、元数据扫描、EXPLAIN、只读事务、Timeout、Cancel和类型归一化。
+- 新增数据库需要同时完成Python方言适配、Go Connector适配和真实数据库集成测试，不能只安装一个Driver。
+- MVP先完成MySQL纵向闭环，再用PostgreSQL验证抽象；Oracle等数据库不在第一版范围内。
+
 ### 有依据的分析结果
 
 - 保存问题、分析计划、生成 SQL、执行结果和最终回答之间的关联。
@@ -69,11 +85,11 @@ Quelyra 通过“Python 智能编排 + Go 安全执行 + Vue3 交互工作台”
 ```mermaid
 flowchart LR
     U["用户 / 数据分析人员"] --> W["Vue3 分析工作台"]
-    W --> A["Python Agent API"]
+    W -->|"Access Token"| A["Python Agent API<br/>AuthN + Workspace AuthZ"]
     A --> G["LangGraph 分析与 Onboarding 工作流"]
     G --> M["大语言模型"]
     G --> P[("平台元数据 PostgreSQL / pgvector")]
-    G --> Q["Go Query Gateway"]
+    G -->|"Service Token + Authorization Context"| Q["Go Query Gateway"]
     Q --> C["凭据管理与安全策略"]
     C --> D1[("MySQL 数据源")]
     C --> D2[("PostgreSQL 数据源")]
@@ -127,7 +143,7 @@ sequenceDiagram
 | Agent API | Python、FastAPI、Pydantic | 公共 API、任务管理与应用服务 |
 | Agent 编排 | LangGraph、LangChain 适配器 | 可恢复、有状态的分析和 Onboarding 工作流 |
 | 查询网关 | Go、Gin | 数据库安全边界与受限查询执行 |
-| 平台数据库 | PostgreSQL、pgvector | 用户、工作区、语义模型、会话、任务和向量检索 |
+| 平台数据库 | PostgreSQL、pgvector | 用户、登录会话、工作区、成员关系、邀请、语义模型、任务和向量检索 |
 | 缓存与结果 | Redis | 短期结果、事件状态与资源控制 |
 | 数据库接入 | MySQL、PostgreSQL | 第一阶段支持的业务数据源 |
 | 契约 | OpenAPI、JSON Schema | 前后端与内部服务的版本化接口 |
@@ -263,6 +279,7 @@ Quelyra 将 Go Query Gateway 作为客户数据库前的强制安全边界：
 ## 路线图
 
 - [ ] 完成 Monorepo 基础工程、健康检查、Docker Compose 与 CI。
+- [ ] 完成注册登录、会话轮换、工作区成员和最小 RBAC。
 - [ ] 完成工作区、数据源和凭据管理。
 - [ ] 完成 MySQL/PostgreSQL Schema 扫描与语义模型 Onboarding。
 - [ ] 完成基础 Text-to-SQL 分析闭环。
