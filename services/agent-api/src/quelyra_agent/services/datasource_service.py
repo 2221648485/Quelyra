@@ -16,6 +16,7 @@ from quelyra_agent.services.workspace_service import WorkspaceService
 
 class DataSourceService:
     def __init__(self, session: AsyncSession, cipher: CredentialCipher, gateway: QueryGatewayClient):
+        """初始化当前组件所需的依赖和配置。"""
         self.session = session
         self.cipher = cipher
         self.gateway = gateway
@@ -23,6 +24,7 @@ class DataSourceService:
         self.workspaces = WorkspaceService(session)
 
     async def create(self, workspace_id: uuid.UUID, actor_id: uuid.UUID, payload: DataSourceCreateRequest) -> dict:
+        """校验权限后创建资源并返回响应数据。"""
         await self.workspaces.require_membership(workspace_id, actor_id, {WorkspaceRole.owner, WorkspaceRole.admin})
         if payload.engine.lower() != "mysql":
             raise ApiError(422, "UNSUPPORTED_DATASOURCE_ENGINE", "Only mysql datasources are supported")
@@ -39,10 +41,12 @@ class DataSourceService:
         return self.serialize(datasource)
 
     async def list(self, workspace_id: uuid.UUID, actor_id: uuid.UUID) -> list[dict]:
+        """校验权限后列出相关资源。"""
         await self.workspaces.require_membership(workspace_id, actor_id)
         return [self.serialize(item) for item in await self.datasources.list(workspace_id)]
 
     async def require_access(self, datasource_id: uuid.UUID, actor_id: uuid.UUID) -> DataSource:
+        """查询数据源并确认用户具有工作区访问权。"""
         datasource = await self.datasources.get_by_id(datasource_id)
         if not datasource:
             raise ApiError(404, "DATASOURCE_NOT_FOUND", "Datasource was not found")
@@ -53,6 +57,7 @@ class DataSourceService:
         return datasource
 
     async def test_connection(self, datasource_id: uuid.UUID, actor_id: uuid.UUID) -> dict:
+        """调用网关测试数据源连接并同步状态。"""
         datasource = await self.require_access(datasource_id, actor_id)
         await self.workspaces.require_membership(datasource.workspace_id, actor_id, {WorkspaceRole.owner, WorkspaceRole.admin})
         result = await self.gateway.test_connection(datasource.id, datasource.workspace_id, actor_id)
@@ -63,6 +68,7 @@ class DataSourceService:
         return self.serialize(datasource)
 
     async def introspect(self, datasource_id: uuid.UUID, actor_id: uuid.UUID) -> dict:
+        """调用网关读取数据源元数据并保存 schema 快照。"""
         datasource = await self.require_access(datasource_id, actor_id)
         await self.workspaces.require_membership(datasource.workspace_id, actor_id, {WorkspaceRole.owner, WorkspaceRole.admin})
         result = await self.gateway.introspect(datasource.id, datasource.workspace_id, actor_id)
@@ -86,6 +92,7 @@ class DataSourceService:
 
     @staticmethod
     def serialize(datasource: DataSource) -> dict:
+        """将数据模型转换为接口响应字典。"""
         return {
             "id": str(datasource.id), "workspace_id": str(datasource.workspace_id),
             "name": datasource.name, "engine": datasource.engine, "dialect": datasource.dialect,

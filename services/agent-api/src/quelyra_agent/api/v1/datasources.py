@@ -1,4 +1,3 @@
-# 用途：提供数据源注册、配置和状态查询接口。
 from __future__ import annotations
 
 import uuid
@@ -16,6 +15,7 @@ router = APIRouter(tags=["datasources"])
 
 
 def service(request: Request, session: AsyncSession) -> DataSourceService:
+    """根据当前请求状态和数据库会话构造业务服务。"""
     return DataSourceService(
         session,
         CredentialCipher(request.app.state.settings.credential_encryption_key),
@@ -24,31 +24,24 @@ def service(request: Request, session: AsyncSession) -> DataSourceService:
 
 
 @router.post("/workspaces/{workspace_id}/datasources", status_code=201)
-async def create_datasource(
-        workspace_id: uuid.UUID,
-        payload: DataSourceCreateRequest,
-        request: Request,
-        current_user: CurrentUser = Depends(get_current_user),
-        session: AsyncSession = Depends(get_session)
-):
+async def create_datasource(workspace_id: uuid.UUID, payload: DataSourceCreateRequest, request: Request, current_user: CurrentUser = Depends(get_current_user), session: AsyncSession = Depends(get_session)):
+    """校验权限后创建资源并返回响应数据。"""
     return envelope(request, await service(request, session).create(workspace_id, current_user.id, payload))
 
 
 @router.get("/workspaces/{workspace_id}/datasources")
-async def list_datasources(workspace_id: uuid.UUID, request: Request,
-                           current_user: CurrentUser = Depends(get_current_user),
-                           session: AsyncSession = Depends(get_session)):
+async def list_datasources(workspace_id: uuid.UUID, request: Request, current_user: CurrentUser = Depends(get_current_user), session: AsyncSession = Depends(get_session)):
+    """校验权限后列出相关资源。"""
     return envelope(request, await service(request, session).list(workspace_id, current_user.id))
 
 
 @router.post("/datasources/{datasource_id}/test-connection")
-async def test_connection(datasource_id: uuid.UUID, request: Request,
-                          current_user: CurrentUser = Depends(get_current_user),
-                          session: AsyncSession = Depends(get_session)):
+async def test_connection(datasource_id: uuid.UUID, request: Request, current_user: CurrentUser = Depends(get_current_user), session: AsyncSession = Depends(get_session)):
+    """调用网关测试数据源连接并同步状态。"""
     return envelope(request, await service(request, session).test_connection(datasource_id, current_user.id))
 
 
 @router.post("/datasources/{datasource_id}/introspect")
-async def introspect(datasource_id: uuid.UUID, request: Request, current_user: CurrentUser = Depends(get_current_user),
-                     session: AsyncSession = Depends(get_session)):
+async def introspect(datasource_id: uuid.UUID, request: Request, current_user: CurrentUser = Depends(get_current_user), session: AsyncSession = Depends(get_session)):
+    """调用网关读取数据源元数据并保存 schema 快照。"""
     return envelope(request, await service(request, session).introspect(datasource_id, current_user.id))

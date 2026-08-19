@@ -1,4 +1,3 @@
-# 用途：加载并校验以 QUELYRA_ 开头的 Python 服务运行配置。
 from __future__ import annotations
 
 import json
@@ -38,6 +37,7 @@ class Settings(BaseSettings):
     @field_validator("cors_origins", mode="before")
     @classmethod
     def parse_cors_origins(cls, value):
+        """支持从 JSON 数组或逗号分隔字符串解析 CORS 来源。"""
         if isinstance(value, str):
             if value.lstrip().startswith("["):
                 return json.loads(value)
@@ -46,6 +46,7 @@ class Settings(BaseSettings):
 
     @model_validator(mode="after")
     def validate_secrets(self) -> "Settings":
+        """在非开发环境中拒绝过短或默认化的敏感配置。"""
         if self.environment.lower() not in {"development", "dev", "test"}:
             weak = (
                 len(self.jwt_secret) < 32
@@ -60,4 +61,5 @@ class Settings(BaseSettings):
 
 @lru_cache
 def get_settings() -> Settings:
+    """读取并缓存应用配置。"""
     return Settings()

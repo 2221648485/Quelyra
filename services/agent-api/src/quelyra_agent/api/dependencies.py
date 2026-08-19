@@ -1,4 +1,5 @@
-# 用途：集中提供请求范围内的 FastAPI 依赖装配。
+from __future__ import annotations
+
 import uuid
 from collections.abc import AsyncIterator
 from dataclasses import dataclass
@@ -11,18 +12,21 @@ from quelyra_agent.api.errors import ApiError
 from quelyra_agent.core.security import decode_access_token
 from quelyra_agent.db.models import User
 
+
 @dataclass
 class CurrentUser:
     model: User
 
     @property
     def id(self) -> uuid.UUID:
+        """返回当前认证用户的唯一标识。"""
         return self.model.id
 
 
 async def get_session(request: Request) -> AsyncIterator[AsyncSession]:
-    with request.app.state.session_factory() as session:
-        return session
+    """创建请求级数据库会话，并在请求结束后释放。"""
+    async with request.app.state.session_factory() as session:
+        yield session
 
 
 async def get_current_user(
@@ -30,6 +34,7 @@ async def get_current_user(
     session: AsyncSession = Depends(get_session),
     authorization: str | None = Header(default=None),
 ) -> CurrentUser:
+    """解析并校验 Bearer 访问令牌，返回当前用户。"""
     if not authorization or not authorization.lower().startswith("bearer "):
         raise ApiError(401, "AUTHENTICATION_REQUIRED", "A bearer access token is required")
     token = authorization.split(" ", 1)[1]

@@ -1,4 +1,3 @@
-# 用途：提供工作区创建、查询和生命周期管理接口。
 import uuid
 
 from fastapi import APIRouter, Depends, Request, Response
@@ -19,6 +18,7 @@ async def create_workspace(
     current_user: CurrentUser = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
 ):
+    """校验权限后创建资源并返回响应数据。"""
     return envelope(request, await WorkspaceService(session).create(current_user.id, payload.name))
 
 
@@ -28,6 +28,7 @@ async def list_workspaces(
     current_user: CurrentUser = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
 ):
+    """校验权限后列出相关资源。"""
     return envelope(request, await WorkspaceService(session).list(current_user.id))
 
 
@@ -38,6 +39,7 @@ async def list_members(
     current_user: CurrentUser = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
 ):
+    """校验权限后列出相关资源。"""
     return envelope(
         request, await WorkspaceService(session).list_members(workspace_id, current_user.id)
     )
@@ -52,6 +54,7 @@ async def update_member_role(
     current_user: CurrentUser = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
 ):
+    """校验权限后更新目标资源。"""
     result = await WorkspaceService(session).update_role(
         workspace_id, current_user.id, member_id, payload.role
     )
@@ -65,5 +68,6 @@ async def delete_member(
     current_user: CurrentUser = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
 ):
+    """校验权限后删除或移除目标资源。"""
     await WorkspaceService(session).remove_member(workspace_id, current_user.id, member_id)
     return Response(status_code=204)

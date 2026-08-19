@@ -1,4 +1,3 @@
-# 用途：提供应用层身份认证、授权和安全基础能力。
 from __future__ import annotations
 
 import hashlib
@@ -15,18 +14,22 @@ password_hash = PasswordHash.recommended()
 
 
 def hash_password(password: str) -> str:
+    """使用推荐算法生成密码哈希。"""
     return password_hash.hash(password)
 
 
 def verify_password(password: str, encoded: str) -> bool:
+    """校验明文密码是否匹配已保存的哈希。"""
     return password_hash.verify(password, encoded)
 
 
 def token_hash(token: str) -> str:
+    """生成令牌哈希，用于安全存储和查询。"""
     return hashlib.sha256(token.encode()).hexdigest()
 
 
 def create_access_token(user_id: str, settings: Settings) -> tuple[str, int]:
+    """为指定用户签发短期访问令牌并返回有效期。"""
     ttl = settings.access_token_ttl_minutes * 60
     now = datetime.now(UTC)
     payload = {
@@ -42,6 +45,7 @@ def create_access_token(user_id: str, settings: Settings) -> tuple[str, int]:
 
 
 def decode_access_token(token: str, settings: Settings) -> dict:
+    """校验并解码访问令牌声明。"""
     return jwt.decode(
         token,
         settings.jwt_secret,
@@ -58,6 +62,7 @@ def create_service_token(
     workspace_id: str,
     datasource_id: str,
 ) -> str:
+    """为服务间调用签发包含租户上下文的短期令牌。"""
     now = datetime.now(UTC)
     payload = {
         "sub": "agent-api",
@@ -75,4 +80,5 @@ def create_service_token(
 
 
 def create_refresh_token() -> str:
+    """生成高熵刷新令牌。"""
     return secrets.token_urlsafe(48)

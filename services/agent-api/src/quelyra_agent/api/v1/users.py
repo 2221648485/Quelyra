@@ -1,4 +1,3 @@
-# 用途：提供当前用户资料和账号状态相关的 HTTP 接口。
 from fastapi import APIRouter, Depends, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -16,5 +15,6 @@ async def me(
     current_user: CurrentUser = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
 ):
+    """说明当前函数的主要职责和返回边界。"""
     workspaces = await WorkspaceService(session).list(current_user.id)
     return envelope(request, {"user": user_data(current_user.model), "workspaces": workspaces})

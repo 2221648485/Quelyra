@@ -1,4 +1,3 @@
-# 用途：声明“持久化模型”目录为 Python 包，并集中表达该模块边界。
 from __future__ import annotations
 
 import enum
@@ -11,6 +10,7 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
 def utcnow() -> datetime:
+    """返回带 UTC 时区的当前时间。"""
     return datetime.now(UTC)
 
 

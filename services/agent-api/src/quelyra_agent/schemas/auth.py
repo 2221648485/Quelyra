@@ -9,11 +9,13 @@ class RegisterRequest(BaseModel):
     @field_validator("email", mode="before")
     @classmethod
     def normalize_email(cls, value):
+        """在入参校验前规范化邮箱。"""
         return value.strip().lower() if isinstance(value, str) else value
 
     @field_validator("name")
     @classmethod
     def clean_name(cls, value: str) -> str:
+        """去除名称两端空白。"""
         return value.strip()
 
 
@@ -24,6 +26,7 @@ class LoginRequest(BaseModel):
     @field_validator("email", mode="before")
     @classmethod
     def normalize_email(cls, value):
+        """在入参校验前规范化邮箱。"""
         return value.strip().lower() if isinstance(value, str) else value
 
 

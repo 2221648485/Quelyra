@@ -1,4 +1,3 @@
-# 用途：编排注册、登录、令牌刷新和会话撤销用例。
 from __future__ import annotations
 
 import uuid
@@ -30,15 +29,18 @@ from quelyra_agent.repositories.workspace_repository import WorkspaceRepository
 
 
 def user_data(user: User) -> dict:
+    """将数据模型转换为接口响应字典。"""
     return {"id": str(user.id), "email": user.email, "name": user.name}
 
 
 def workspace_data(workspace: Workspace, membership: WorkspaceMember) -> dict:
+    """将数据模型转换为接口响应字典。"""
     return {"id": str(workspace.id), "name": workspace.name, "role": membership.role.value}
 
 
 class AuthService:
     def __init__(self, session: AsyncSession, settings: Settings):
+        """初始化当前组件所需的依赖和配置。"""
         self.session = session
         self.settings = settings
         self.users = UserRepository(session)
@@ -46,6 +48,7 @@ class AuthService:
         self.workspaces = WorkspaceRepository(session)
 
     async def register(self, email: str, password: str, name: str) -> dict:
+        """创建用户、默认工作区和所有者成员关系。"""
         email = email.strip().lower()
         if await self.users.get_by_email(email):
             raise ApiError(409, "EMAIL_ALREADY_EXISTS", "An account with this email already exists")
@@ -68,12 +71,14 @@ class AuthService:
         return {"user": user_data(user), "workspaces": [workspace_data(workspace, membership)]}
 
     async def login(self, email: str, password: str) -> dict:
+        """校验用户凭据并签发登录令牌。"""
         user = await self.users.get_by_email(email.strip().lower())
         if not user or not user.is_active or not verify_password(password, user.password_hash):
             raise ApiError(401, "INVALID_CREDENTIALS", "Email or password is incorrect")
         return await self._issue_tokens(user)
 
     async def _issue_tokens(self, user: User, family_id: uuid.UUID | None = None) -> dict:
+        """创建访问令牌、刷新令牌和会话记录。"""
         access_token, expires_in = create_access_token(str(user.id), self.settings)
         refresh_token = create_refresh_token()
         if family_id is None:
@@ -100,6 +105,7 @@ class AuthService:
         }
 
     async def refresh(self, refresh_token: str) -> dict:
+        """校验刷新令牌，检测重放并轮换新令牌。"""
         value_hash = token_hash(refresh_token)
         initial_record = await self.sessions.get_by_token_hash(value_hash)
         now = datetime.now(UTC)
@@ -136,6 +142,7 @@ class AuthService:
         return await self._issue_tokens(user, record.family_id)
 
     async def logout(self, refresh_token: str) -> None:
+        """撤销刷新令牌所在的会话族。"""
         record = await self.sessions.get_by_token_hash(token_hash(refresh_token))
         if record:
             family = await self.sessions.lock_family(record.family_id)
@@ -146,5 +153,6 @@ class AuthService:
             await self.session.commit()
 
     async def logout_all(self, user_id: uuid.UUID) -> None:
+        """撤销指定用户的所有登录会话。"""
         await self.sessions.revoke_all(user_id)
         await self.session.commit()
