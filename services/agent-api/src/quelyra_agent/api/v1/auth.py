@@ -1,6 +1,5 @@
 # 用途：提供身份认证和当前用户相关的 HTTP 接口。
-import Response
-from fastapi import FastAPI, APIRouter,Request,status,Depends
+from fastapi import FastAPI, APIRouter,Request,status,Depends,Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from quelyra_agent.api.dependencies import get_session, CurrentUser, get_current_user
@@ -50,4 +49,3 @@ async def logout_all(
 ):
     await AuthService(session, request.app.state.settings).logout_all(current_user.id)
     return Response(status_code=204)
-}
