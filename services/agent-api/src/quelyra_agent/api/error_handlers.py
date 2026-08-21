@@ -1,76 +1,28 @@
-from __future__ import annotations
+"""将框架异常映射为统一 API 错误响应。"""
 
-from fastapi import Request
-from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse
-from starlette.exceptions import HTTPException
-
-from quelyra_agent.api.errors import ApiError
+from typing import Any
 
 
-def request_id(request: Request) -> str:
-    """读取请求上下文中的请求 ID。"""
-    return getattr(request.state, "request_id", "unknown")
+def request_id(request: Any) -> str:
+    """TODO：从请求上下文读取 request ID，没有时生成安全的兜底值。"""
+    raise NotImplementedError("待实现：读取 request ID")
 
 
-async def api_error_handler(request: Request, exc: ApiError) -> JSONResponse:
-    """将 API 业务异常转换为统一错误响应。"""
-    return JSONResponse(
-        status_code=exc.status_code,
-        content={
-            "error": {
-                "code": exc.code,
-                "message": exc.message,
-                "request_id": request_id(request),
-                "details": exc.details,
-            }
-        },
-    )
+async def api_error_handler(request: Any, exc: Exception) -> Any:
+    """TODO：转换已知业务错误，返回统一错误信封。"""
+    raise NotImplementedError("待实现：处理业务错误")
 
 
-async def validation_error_handler(request: Request, exc: RequestValidationError) -> JSONResponse:
-    """将请求校验异常转换为统一错误响应。"""
-    return JSONResponse(
-        status_code=422,
-        content={
-            "error": {
-                "code": "VALIDATION_ERROR",
-                "message": "Request validation failed",
-                "request_id": request_id(request),
-                "details": exc.errors(),
-            }
-        },
-    )
+async def validation_error_handler(request: Any, exc: Exception) -> Any:
+    """TODO：转换输入校验错误，不能回显敏感输入。"""
+    raise NotImplementedError("待实现：处理校验错误")
 
 
-async def http_error_handler(request: Request, exc: HTTPException) -> JSONResponse:
-    """将 HTTP 异常转换为统一错误响应。"""
-    message = exc.detail if isinstance(exc.detail, str) else "HTTP request failed"
-    details = None if isinstance(exc.detail, str) else exc.detail
-    return JSONResponse(
-        status_code=exc.status_code,
-        headers=exc.headers,
-        content={
-            "error": {
-                "code": f"HTTP_{exc.status_code}",
-                "message": message,
-                "request_id": request_id(request),
-                "details": details,
-            }
-        },
-    )
+async def http_error_handler(request: Any, exc: Exception) -> Any:
+    """TODO：转换 HTTP 异常并保留安全的状态码。"""
+    raise NotImplementedError("待实现：处理 HTTP 错误")
 
 
-async def unhandled_error_handler(request: Request, exc: Exception) -> JSONResponse:
-    """将未捕获异常转换为统一的 500 错误响应。"""
-    return JSONResponse(
-        status_code=500,
-        content={
-            "error": {
-                "code": "INTERNAL_ERROR",
-                "message": "An unexpected error occurred",
-                "request_id": request_id(request),
-                "details": None,
-            }
-        },
-    )
+async def unhandled_error_handler(request: Any, exc: Exception) -> Any:
+    """TODO：记录内部错误并返回不含内部细节的 500 响应。"""
+    raise NotImplementedError("待实现：处理未捕获错误")

@@ -1,3 +1,0 @@
-// 用途：编排加密凭据生命周期相关用例。
-
-package application

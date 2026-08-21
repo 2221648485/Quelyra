@@ -1,18 +1,16 @@
-// 用途：在请求上下文中安全传递已验证的内部授权信息。
+// Package auth 提供认证中间件与后续 handler 之间的上下文传递。
 package auth
-
-import "github.com/gin-gonic/gin"
 
 const claimsKey = "service_claims"
 
-func Get(c *gin.Context) (*Claims, bool) {
-	claims, ok := c.Get(claimsKey)
-	if !ok {
-		return nil, false
-	}
-	return claims.(*Claims), true
+// Set 将已验证的 claims 放入请求上下文。
+// 实现提示：只能由认证中间件调用；不要将原始 token 放入 context 或日志。
+func Set(context any, claims *Claims) {
+	panic("待实现：写入已验证的服务声明")
 }
 
-func Set(c *gin.Context, claims *Claims) {
-	c.Set(claimsKey, claims)
+// Get 读取认证中间件写入的 claims。
+// 实现提示：类型断言失败与缺失都视为未认证，handler 不应继续执行。
+func Get(context any) (*Claims, bool) {
+	panic("待实现：读取已验证的服务声明")
 }

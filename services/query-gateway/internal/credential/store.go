@@ -1,3 +1,0 @@
-// 用途：定义秘密或结果制品的存储接口。
-
-package credential

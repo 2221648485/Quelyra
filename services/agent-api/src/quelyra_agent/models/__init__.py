@@ -1,1 +1,1 @@
-"""Model provider abstractions."""
+"""模型供应商的领域接口。"""

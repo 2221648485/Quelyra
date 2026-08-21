@@ -1,24 +1,15 @@
-from __future__ import annotations
-
-import base64
-import hashlib
-
-from cryptography.fernet import Fernet, InvalidToken
+"""数据源凭据的加密边界。"""
 
 
 class CredentialCipher:
     def __init__(self, key: str):
-        """初始化当前组件所需的依赖和配置。"""
-        derived = base64.urlsafe_b64encode(hashlib.sha256(key.encode()).digest())
-        self._fernet = Fernet(derived)
+        """TODO：验证密钥来源；生产环境应采用 KMS 或信封加密。"""
+        raise NotImplementedError("待实现：初始化凭据加密器")
 
     def encrypt(self, plaintext: str) -> str:
-        """说明当前函数的主要职责和返回边界。"""
-        return self._fernet.encrypt(plaintext.encode()).decode()
+        """TODO：加密凭据后才能持久化，日志中不得出现 plaintext。"""
+        raise NotImplementedError("待实现：加密凭据")
 
     def decrypt(self, ciphertext: str) -> str:
-        """说明当前函数的主要职责和返回边界。"""
-        try:
-            return self._fernet.decrypt(ciphertext.encode()).decode()
-        except InvalidToken as exc:
-            raise ValueError("Stored credential cannot be decrypted") from exc
+        """TODO：仅在调用 Gateway 前短暂解密，失败时返回通用错误。"""
+        raise NotImplementedError("待实现：解密凭据")

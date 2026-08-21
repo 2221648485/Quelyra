@@ -1,3 +1,0 @@
-// 用途：将凭据管理 HTTP 请求映射到应用用例。
-
-package handlers

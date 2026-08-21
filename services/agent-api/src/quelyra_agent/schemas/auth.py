@@ -1,38 +1,32 @@
-from pydantic import BaseModel, EmailStr, Field, field_validator
+"""认证 API 的请求契约。"""
 
 
-class RegisterRequest(BaseModel):
-    email: EmailStr
-    password: str = Field(min_length=10, max_length=256)
-    name: str = Field(min_length=1, max_length=200)
+class RegisterRequest:
+    """TODO：定义注册输入字段和密码策略。"""
 
-    @field_validator("email", mode="before")
     @classmethod
-    def normalize_email(cls, value):
-        """在入参校验前规范化邮箱。"""
-        return value.strip().lower() if isinstance(value, str) else value
+    def normalize_email(cls, value: str) -> str:
+        """TODO：标准化邮箱并拒绝空值。"""
+        raise NotImplementedError("待实现：标准化邮箱")
 
-    @field_validator("name")
     @classmethod
     def clean_name(cls, value: str) -> str:
-        """去除名称两端空白。"""
-        return value.strip()
+        """TODO：去除首尾空白并限制显示名长度。"""
+        raise NotImplementedError("待实现：清理显示名")
 
 
-class LoginRequest(BaseModel):
-    email: EmailStr
-    password: str
+class LoginRequest:
+    """TODO：定义登录邮箱与密码字段。"""
 
-    @field_validator("email", mode="before")
     @classmethod
-    def normalize_email(cls, value):
-        """在入参校验前规范化邮箱。"""
-        return value.strip().lower() if isinstance(value, str) else value
+    def normalize_email(cls, value: str) -> str:
+        """TODO：复用同一邮箱规范化规则。"""
+        raise NotImplementedError("待实现：标准化登录邮箱")
 
 
-class RefreshRequest(BaseModel):
-    refresh_token: str = Field(min_length=32)
+class RefreshRequest:
+    """TODO：定义刷新令牌输入，令牌只能通过安全 Cookie 或受控请求体传递。"""
 
 
 class LogoutRequest(RefreshRequest):
-    pass
+    """TODO：定义登出时撤销指定会话族或全部会话的字段。"""

@@ -1,46 +1,30 @@
-from __future__ import annotations
+"""工作区仓储骨架。"""
 
-import uuid
-
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
-
-from quelyra_agent.db.models import Workspace, WorkspaceMember
+from typing import Any
 
 
 class WorkspaceRepository:
-    def __init__(self, session: AsyncSession):
-        """初始化当前组件所需的依赖和配置。"""
-        self.session = session
+    def __init__(self, session: Any):
+        """TODO：保存异步数据库会话。"""
+        raise NotImplementedError("待实现：初始化工作区仓储")
 
-    def add(self, workspace: Workspace) -> None:
-        """将模型对象加入当前数据库事务。"""
-        self.session.add(workspace)
+    def add(self, workspace: Any) -> None:
+        """TODO：将新工作区加入当前事务。"""
+        raise NotImplementedError("待实现：新增工作区")
 
     @staticmethod
-    def workspace_for_update_statement(workspace_id: uuid.UUID):
-        """构造或执行行级锁查询，保护并发更改。"""
-        return select(Workspace).where(Workspace.id == workspace_id).with_for_update()
+    def workspace_for_update_statement(workspace_id: Any) -> Any:
+        """TODO：构造工作区行锁语句。"""
+        raise NotImplementedError("待实现：构造工作区锁")
 
-    async def lock_for_update(self, workspace_id: uuid.UUID) -> Workspace | None:
-        """构造或执行行级锁查询，保护并发更改。"""
-        return await self.session.scalar(self.workspace_for_update_statement(workspace_id))
+    async def lock_for_update(self, workspace_id: Any) -> Any | None:
+        """TODO：更新成员角色前锁定工作区。"""
+        raise NotImplementedError("待实现：锁定工作区")
 
-    async def get_for_user(self, workspace_id: uuid.UUID, user_id: uuid.UUID) -> Workspace | None:
-        """查询指定资源并返回结果。"""
-        statement = (
-            select(Workspace)
-            .join(WorkspaceMember, WorkspaceMember.workspace_id == Workspace.id)
-            .where(Workspace.id == workspace_id, WorkspaceMember.user_id == user_id)
-        )
-        return await self.session.scalar(statement)
+    async def get_for_user(self, workspace_id: Any, user_id: Any) -> Any | None:
+        """TODO：只返回该用户可见的工作区。"""
+        raise NotImplementedError("待实现：获取用户工作区")
 
-    async def list_for_user(self, user_id: uuid.UUID) -> list[tuple[Workspace, WorkspaceMember]]:
-        """校验权限后列出相关资源。"""
-        statement = (
-            select(Workspace, WorkspaceMember)
-            .join(WorkspaceMember, WorkspaceMember.workspace_id == Workspace.id)
-            .where(WorkspaceMember.user_id == user_id)
-            .order_by(Workspace.created_at)
-        )
-        return list((await self.session.execute(statement)).all())
+    async def list_for_user(self, user_id: Any) -> list[Any]:
+        """TODO：按创建时间列出用户工作区和成员角色。"""
+        raise NotImplementedError("待实现：列出用户工作区")

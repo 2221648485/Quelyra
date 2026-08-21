@@ -1,13 +1,6 @@
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
-
-from quelyra_agent.core.config import Settings
+"""SQLAlchemy 异步数据库会话边界。"""
 
 
-def build_engine(settings: Settings):
-    """根据配置创建异步 SQLAlchemy 引擎。"""
-    return create_async_engine(settings.database_url, pool_pre_ping=True)
-
-
-def build_session_factory(engine) -> async_sessionmaker[AsyncSession]:
-    """创建请求级异步数据库会话工厂。"""
-    return async_sessionmaker(engine, expire_on_commit=False)
+def build_session_factory(settings):
+    """TODO：创建 async engine 和 async_sessionmaker；请求与 Worker 任务不得共享 Session。"""
+    raise NotImplementedError

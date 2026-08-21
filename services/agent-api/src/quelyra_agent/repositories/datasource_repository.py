@@ -1,66 +1,37 @@
-from __future__ import annotations
+"""工作区隔离的数据源仓储骨架。"""
 
-import uuid
 from typing import Any
-
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
-
-from quelyra_agent.db.models import DataSource
 
 
 class DataSourceRepository:
-    """All business-resource queries require the tenant workspace explicitly."""
+    def __init__(self, session: Any):
+        """TODO：保存异步数据库会话。"""
+        raise NotImplementedError("待实现：初始化数据源仓储")
 
-    def __init__(self, session: AsyncSession):
-        """初始化当前组件所需的依赖和配置。"""
-        self.session = session
+    async def create(self, workspace_id: Any, values: dict[str, Any]) -> Any:
+        """TODO：按 workspace_id 创建数据源并 flush。"""
+        raise NotImplementedError("待实现：创建数据源")
 
-    async def create(self, workspace_id: uuid.UUID, values: dict[str, Any]) -> DataSource:
-        """校验权限后创建资源并返回响应数据。"""
-        datasource = DataSource(workspace_id=workspace_id, **values)
-        self.session.add(datasource)
-        await self.session.flush()
-        return datasource
+    async def get(self, workspace_id: Any, datasource_id: Any) -> Any | None:
+        """TODO：查询时必须同时过滤工作区和数据源 ID。"""
+        raise NotImplementedError("待实现：获取数据源")
 
-    async def get(self, workspace_id: uuid.UUID, datasource_id: uuid.UUID) -> DataSource | None:
-        """查询指定资源并返回结果。"""
-        return await self.session.scalar(
-            select(DataSource).where(
-                DataSource.workspace_id == workspace_id, DataSource.id == datasource_id
-            )
-        )
+    async def get_by_id(self, datasource_id: Any) -> Any | None:
+        """TODO：仅用于后续显式工作区鉴权的内部查询。"""
+        raise NotImplementedError("待实现：按 ID 获取数据源")
 
-    async def get_by_id(self, datasource_id: uuid.UUID) -> DataSource | None:
-        """查询指定资源并返回结果。"""
-        return await self.session.get(DataSource, datasource_id)
+    async def lock_for_update(self, workspace_id: Any, datasource_id: Any) -> Any | None:
+        """TODO：对数据源行加锁，序列化 schema/画像版本变更。"""
+        raise NotImplementedError("待实现：锁定数据源")
 
-    async def lock_for_update(self, workspace_id: uuid.UUID, datasource_id: uuid.UUID) -> DataSource | None:
-        """构造或执行行级锁查询，保护并发更改。"""
-        return await self.session.scalar(
-            select(DataSource).where(
-                DataSource.workspace_id == workspace_id, DataSource.id == datasource_id
-            ).with_for_update()
-        )
+    async def list(self, workspace_id: Any) -> list[Any]:
+        """TODO：只列出当前工作区的数据源。"""
+        raise NotImplementedError("待实现：列出数据源")
 
-    async def list(self, workspace_id: uuid.UUID) -> list[DataSource]:
-        """校验权限后列出相关资源。"""
-        return list(
-            (await self.session.scalars(select(DataSource).where(DataSource.workspace_id == workspace_id))).all()
-        )
+    async def update(self, workspace_id: Any, datasource_id: Any, values: dict[str, Any]) -> Any | None:
+        """TODO：更新前验证工作区归属，凭据由加密边界处理。"""
+        raise NotImplementedError("待实现：更新数据源")
 
-    async def update(self, workspace_id: uuid.UUID, datasource_id: uuid.UUID, values: dict[str, Any]) -> DataSource | None:
-        """校验权限后更新目标资源。"""
-        datasource = await self.get(workspace_id, datasource_id)
-        if datasource:
-            for key, value in values.items():
-                setattr(datasource, key, value)
-        return datasource
-
-    async def delete(self, workspace_id: uuid.UUID, datasource_id: uuid.UUID) -> bool:
-        """校验权限后删除或移除目标资源。"""
-        datasource = await self.get(workspace_id, datasource_id)
-        if not datasource:
-            return False
-        await self.session.delete(datasource)
-        return True
+    async def delete(self, workspace_id: Any, datasource_id: Any) -> bool:
+        """TODO：删除前检查关联任务、快照和审计保留策略。"""
+        raise NotImplementedError("待实现：删除数据源")

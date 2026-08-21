@@ -1,53 +1,29 @@
-from __future__ import annotations
+"""工作区成员关系仓储骨架。"""
 
-import uuid
-
-from sqlalchemy import func, select
-from sqlalchemy.ext.asyncio import AsyncSession
-
-from quelyra_agent.db.models import User, WorkspaceMember, WorkspaceRole
+from typing import Any
 
 
 class MembershipRepository:
-    def __init__(self, session: AsyncSession):
-        """初始化当前组件所需的依赖和配置。"""
-        self.session = session
+    def __init__(self, session: Any):
+        """TODO：保存异步数据库会话。"""
+        raise NotImplementedError("待实现：初始化成员仓储")
 
-    def add(self, membership: WorkspaceMember) -> None:
-        """将模型对象加入当前数据库事务。"""
-        self.session.add(membership)
+    def add(self, membership: Any) -> None:
+        """TODO：加入成员关系到当前事务。"""
+        raise NotImplementedError("待实现：新增成员")
 
-    async def get(self, workspace_id: uuid.UUID, user_id: uuid.UUID) -> WorkspaceMember | None:
-        """查询指定资源并返回结果。"""
-        return await self.session.scalar(
-            select(WorkspaceMember).where(
-                WorkspaceMember.workspace_id == workspace_id,
-                WorkspaceMember.user_id == user_id,
-            )
-        )
+    async def get(self, workspace_id: Any, user_id: Any) -> Any | None:
+        """TODO：按工作区和用户获取成员关系。"""
+        raise NotImplementedError("待实现：获取成员")
 
-    async def list(self, workspace_id: uuid.UUID) -> list[tuple[WorkspaceMember, User]]:
-        """校验权限后列出相关资源。"""
-        statement = (
-            select(WorkspaceMember, User)
-            .join(User, User.id == WorkspaceMember.user_id)
-            .where(WorkspaceMember.workspace_id == workspace_id)
-            .order_by(WorkspaceMember.created_at)
-        )
-        return list((await self.session.execute(statement)).all())
+    async def list(self, workspace_id: Any) -> list[Any]:
+        """TODO：列出成员及必要的公开用户信息。"""
+        raise NotImplementedError("待实现：列出成员")
 
-    async def owner_count(self, workspace_id: uuid.UUID) -> int:
-        """说明当前函数的主要职责和返回边界。"""
-        return int(
-            await self.session.scalar(
-                select(func.count()).select_from(WorkspaceMember).where(
-                    WorkspaceMember.workspace_id == workspace_id,
-                    WorkspaceMember.role == WorkspaceRole.owner,
-                )
-            )
-            or 0
-        )
+    async def owner_count(self, workspace_id: Any) -> int:
+        """TODO：角色变更前统计 owner，防止移除最后一个 owner。"""
+        raise NotImplementedError("待实现：统计 owner")
 
-    async def delete(self, membership: WorkspaceMember) -> None:
-        """校验权限后删除或移除目标资源。"""
-        await self.session.delete(membership)
+    async def delete(self, membership: Any) -> None:
+        """TODO：删除已鉴权的成员关系。"""
+        raise NotImplementedError("待实现：删除成员")

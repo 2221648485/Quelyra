@@ -1,20 +1,8 @@
-from fastapi import APIRouter, Depends, Request
-from sqlalchemy.ext.asyncio import AsyncSession
+"""用户自身信息路由。"""
 
-from quelyra_agent.api.dependencies import CurrentUser, get_current_user, get_session
-from quelyra_agent.api.v1.auth import envelope
-from quelyra_agent.services.auth_service import user_data
-from quelyra_agent.services.workspace_service import WorkspaceService
-
-router = APIRouter(tags=["users"])
+from typing import Any
 
 
-@router.get("/me")
-async def me(
-    request: Request,
-    current_user: CurrentUser = Depends(get_current_user),
-    session: AsyncSession = Depends(get_session),
-):
-    """说明当前函数的主要职责和返回边界。"""
-    workspaces = await WorkspaceService(session).list(current_user.id)
-    return envelope(request, {"user": user_data(current_user.model), "workspaces": workspaces})
+async def me(request: Any, current_user: Any, session: Any) -> dict:
+    """TODO：读取当前用户和其可见工作区，脱敏后包装为 API 响应。"""
+    raise NotImplementedError("待实现：获取当前用户")

@@ -1,13 +1,9 @@
-from __future__ import annotations
+"""API 业务错误的统一表达。"""
 
 from typing import Any
 
 
 class ApiError(Exception):
     def __init__(self, status_code: int, code: str, message: str, details: Any = None):
-        """保存 API 错误的状态码、业务码、消息和详情。"""
-        self.status_code = status_code
-        self.code = code
-        self.message = message
-        self.details = details
-        super().__init__(message)
+        """TODO：保存可公开的错误信息；禁止把异常堆栈、凭据或 SQL 原样放入 details。"""
+        raise NotImplementedError("待实现：构造 API 错误")

@@ -1,3 +1,0 @@
-// 用途：持久化只追加的安全与执行审计事件。
-
-package repository

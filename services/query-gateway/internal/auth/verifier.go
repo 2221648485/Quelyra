@@ -1,42 +1,22 @@
-// 用途：验证内部服务令牌的签名、签发方、受众和有效期。
 package auth
 
-import (
-	"errors"
-	"strings"
-
-	"github.com/golang-jwt/jwt/v5"
-)
-
+// Verifier 保存验证服务令牌所需的密钥及签发范围。
+// 实现提示：生产中密钥来自受控配置或密钥管理服务，禁止在源码或日志中出现。
 type Verifier struct {
-	secret           []byte
-	issuer, audience string
+	secret   []byte
+	issuer   string
+	audience string
 }
 
+// NewVerifier 构造令牌验证器。
+// 实现提示：启动时拒绝空密钥、空 issuer/audience 和不支持的签名算法。
 func NewVerifier(secret []byte, issuer, audience string) *Verifier {
-	return &Verifier{secret: secret, issuer: issuer, audience: audience}
+	panic("待实现：构造服务令牌验证器")
 }
+
+// Verify 验证并解析服务令牌。
+// 实现顺序：去除空白 → 限制为预期签名算法 → 验签 → 校验 issuer/audience/exp →
+// 校验 type=service 与资源 claims → 返回最小化 Claims。
 func (v *Verifier) Verify(raw string) (*Claims, error) {
-	raw = strings.TrimSpace(raw)
-	return v.parse(raw)
-}
-
-// 解析token
-func (v *Verifier) parse(raw string) (*Claims, error) {
-	claims := &Claims{}
-	token, err := jwt.ParseWithClaims(raw, claims, func(t *jwt.Token) (interface{}, error) {
-		if t.Method != jwt.SigningMethodHS256 {
-			return nil, errors.New("only HS256 is accepted")
-		}
-		return v.secret, nil
-	}, jwt.WithIssuer(v.issuer), jwt.WithAudience(v.audience), jwt.WithExpirationRequired())
-
-	if err != nil || token == nil || !token.Valid {
-		return nil, errors.New("invalid token")
-	}
-	c, ok := token.Claims.(*Claims)
-	if !ok || c.Type != "service" || c.Subject == "" || c.ActorID == "" || c.WorkspaceID == "" || c.DatasourceID == "" {
-		return nil, errors.New("required service claims are missing")
-	}
-	return c, nil
+	panic("待实现：验证服务令牌")
 }

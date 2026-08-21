@@ -1,28 +1,9 @@
-// 用途：组装依赖并启动 Go 查询网关进程。
+// Query Gateway 的程序入口。
 package main
 
-import (
-	"context"
-	"log/slog"
-	"query-gateway/internal/api"
-	"query-gateway/internal/config"
-	"query-gateway/internal/telemetry"
-)
-
 func main() {
-	cfg := config.Load()
-	Init(cfg)
-	app := api.NewRouter()
-	if err := app.Run(":" + cfg.App.Port); err != nil {
-		slog.Error("server stopped with error", "error", err)
-	}
-}
-
-// 相关资源初始化
-func Init(cfg config.Config) {
-	telemetry.InitLogger(config.Env())
-
-	slog.Info("配置文件加载成功...")
-	resources := api.InitResources(context.Background(), cfg)
-	defer resources.Close()
+	// TODO(01): 读取环境变量与配置文件。
+	// TODO(02): 创建数据库、Redis、审计等基础设施连接。
+	// TODO(03): 组装 HTTP 路由、认证中间件和优雅退出逻辑。
+	// TODO(04): 启动 HTTP 服务；不要在 main 中编写业务规则。
 }

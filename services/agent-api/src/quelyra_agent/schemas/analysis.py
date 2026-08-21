@@ -1,14 +1,9 @@
-from __future__ import annotations
-
-import uuid
-
-from pydantic import BaseModel, Field
+"""分析会话和提问 API 契约。"""
 
 
-class ConversationCreateRequest(BaseModel):
-    title: str = Field(default="New conversation", min_length=1, max_length=300)
+class ConversationCreateRequest:
+    """TODO：定义 title 的长度、字符集和空白校验。"""
 
 
-class QuestionRequest(BaseModel):
-    datasource_id: uuid.UUID
-    question: str = Field(min_length=1, max_length=10_000)
+class QuestionRequest:
+    """TODO：定义 datasource_id、question 和可选会话 ID 的输入校验。"""
